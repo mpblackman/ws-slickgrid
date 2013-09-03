@@ -66,12 +66,14 @@ module Definition =
 
             let Columnpicker =
                 Resource "Columnpicker" "slick.columnpicker.js"
+                |> Requires [ColumnpickerCss]
 
             let PagerCss =
                 Resource "PagerCss" "slick.pager.css"
 
             let Pager =
                 Resource "Pager" "slick.pager.js"
+                |> Requires [PagerCss]
 
     let Box =
         Class "Slick.Box"
@@ -135,31 +137,34 @@ module Definition =
 
     let Column =
         Generic / fun t ->
-            Class "Slick.Column"
+            Pattern.Config "Slick.Column" {
+                Required =
+                    [
+                        "id", T<string>
+                        "name", T<string>
+                    ]
+                Optional =
+                    [
+                        "behavior", T<string>
+                        "cannotTriggerInsert", T<bool>
+                        "cssClass", T<string>
+                        "editor", (EditorGenerator t).Type
+                        "field", T<string>
+                        "formatter", Formatter t
+                        "headerCssClass", T<string>
+                        "id", T<string>
+                        "maxWidth", T<int>
+                        "minWidth", T<int>
+                        "name", T<string>
+                        "rerenderOnResize", T<bool>
+                        "resizable", T<bool>
+                        "selectable", T<bool>
+                        "sortable", T<bool>
+                        "validator", T<string> ^-> ValidationResults
+                        "width", T<int>
+                    ]
+            }
             |=> Column_t
-            |+> [
-                    Constructor (T<string> * T<string>)
-                    Constructor (T<string> * T<string> * T<string>)
-                ]
-            |+> Protocol [
-                    "behavior" =% T<string>
-                    "cannotTriggerInsert" =% T<bool>
-                    "cssClass" =% T<string>
-                    "editor" =% EditorGenerator t
-                    "field" =% T<string>
-                    "formatter" =% Formatter t
-                    "headerCssClass" =% T<string>
-                    "id" =% T<string>
-                    "maxWidth" =% T<int>
-                    "minWidth" =% T<int>
-                    "name" =% T<string>
-                    "rerenderOnResize" =% T<bool>
-                    "resizable" =% T<bool>
-                    "selectable" =% T<bool>
-                    "sortable" =% T<bool>
-                    "validator" =% T<string> ^-> ValidationResults
-                    "width" =% T<int>
-                ]
 
     let BeforeEditCellEventArgs =
         Generic / fun t ->
@@ -413,25 +418,27 @@ module Definition =
             ]
 
     let Editors =
-        Class "Slick.Editors"
-        |+> [
-                Generic - fun t -> "Checkbox" =? EditorGenerator t
-                Generic - fun t -> "Date" =? EditorGenerator t
-                Generic - fun t -> "Integer" =? EditorGenerator t
-                Generic - fun t -> "LongText" =? EditorGenerator t
-                Generic - fun t -> "PercentComplete" =? EditorGenerator t
-                Generic - fun t -> "Text" =? EditorGenerator t
-                Generic - fun t -> "YesNoSelect" =? EditorGenerator t
-            ]
+        Generic / fun t ->
+            Class "Slick.Editors"
+            |+> [
+                    "Checkbox" =? EditorGenerator t
+                    "Date" =? EditorGenerator t
+                    "Integer" =? EditorGenerator t
+                    "LongText" =? EditorGenerator t
+                    "PercentComplete" =? EditorGenerator t
+                    "Text" =? EditorGenerator t
+                    "YesNoSelect" =? EditorGenerator t
+                ]
 
     let Formatters =
-        Class "Slick.Formatters"
-        |+> [
-                Generic - fun t -> "Checkmark" =? Formatter t
-                Generic - fun t -> "PercentComplete" =? Formatter t
-                Generic - fun t -> "PercentCompleteBar" =? Formatter t
-                Generic - fun t -> "YesNo" =? Formatter t
-            ]
+        Generic / fun t ->
+            Class "Slick.Formatters"
+            |+> [
+                    "Checkmark" =? Formatter t
+                    "PercentComplete" =? Formatter t
+                    "PercentCompleteBar" =? Formatter t
+                    "YesNo" =? Formatter t
+                ]
 
     let FromToRangesArgs =
         Class "Slick.FromToRangesArgs"
@@ -625,7 +632,7 @@ module Definition =
 
         let Aggregator =
             Generic / fun t ->
-                Class "Slick.Aggregator"
+                Class "Slick.Data.Aggregator"
                 |+> Protocol [
                         "accumulate" => t ^-> T<unit>
                         "init" => T<unit -> unit>
@@ -634,7 +641,7 @@ module Definition =
 
         let ColumnMetadata =
             Generic / fun t ->
-                Pattern.Config "Slick.ColumnMetadata" {
+                Pattern.Config "Slick.Data.ColumnMetadata" {
                     Required = []
                     Optional =
                         [
@@ -646,7 +653,7 @@ module Definition =
 
         let Metadata =
             Generic / fun t ->
-                Pattern.Config "Slick.Metadata" {
+                Pattern.Config "Slick.Data.Metadata" {
                     Required = []
                     Optional =
                         [
@@ -660,7 +667,7 @@ module Definition =
                 }
 
         let GroupItemMetadataProviderOptions =
-            Pattern.Config "Slick.GroupItemMetadataProviderOptions" {
+            Pattern.Config "Slick.Data.GroupItemMetadataProviderOptions" {
                 Required = []
                 Optional =
                     [
@@ -677,7 +684,7 @@ module Definition =
 
         let GroupItemMetadataProvider =
             Generic / fun t ->
-                Class "Slick.GroupItemMetadataProvider"
+                Class "Slick.Data.GroupItemMetadataProvider"
                 |+> [Constructor (!?GroupItemMetadataProviderOptions)]
                 |+> Protocol [
                         "destroy" => T<unit -> unit>
@@ -687,7 +694,7 @@ module Definition =
                     ]
 
         let PagingInfo =
-            Class "Slick.PagingInfo"
+            Class "Slick.Data.PagingInfo"
             |+> Protocol [
                     "pageNum" =? T<int>
                     "pageSize" =? T<int>
@@ -696,7 +703,7 @@ module Definition =
                 ]
 
         let PagingOptions =
-            Pattern.Config "Slick.PagingOptions" {
+            Pattern.Config "Slick.Data.PagingOptions" {
                 Required = []
                 Optional =
                     [
@@ -706,7 +713,7 @@ module Definition =
             }
 
         let RefreshHints =
-            Pattern.Config "Slick.RefreshHints" {
+            Pattern.Config "Slick.Data.RefreshHints" {
                 Required = []
                 Optional =
                     [
@@ -720,7 +727,7 @@ module Definition =
 
         let DataViewOptions =
             Generic / fun t ->
-                Pattern.Config "Slick.DataViewOptions" {
+                Pattern.Config "Slick.Data.DataViewOptions" {
                     Required = []
                     Optional =
                         [
@@ -732,7 +739,7 @@ module Definition =
 
         let DataView =
             Generic / fun t ->
-                Class "Slick.DataView"
+                Class "Slick.Data.DataView"
                 |+> [Constructor (!?(DataViewOptions t))]
                 |+> Protocol [
                         "onPagingInfoChanged" =? Event PagingInfo
@@ -777,25 +784,25 @@ module Definition =
 
             let AvgAggregator =
                 Generic / fun t ->
-                    Class "Slick.AvgAggregator"
+                    Class "Slick.Data.Aggregators.Avg"
                     |=> Inherits (Aggregator t)
                     |+> [Constructor T<string>]
 
             let MaxAggregator =
                 Generic / fun t ->
-                    Class "Slick.MaxAggregator"
+                    Class "Slick.Data.Aggregators.Max"
                     |=> Inherits (Aggregator t)
                     |+> [Constructor T<string>]
 
             let MinAggregator =
                 Generic / fun t ->
-                    Class "Slick.MinAggregator"
+                    Class "Slick.Data.Aggregators.Min"
                     |=> Inherits (Aggregator t)
                     |+> [Constructor T<string>]
 
             let SumAggregator =
                 Generic / fun t ->
-                    Class "Slick.SumAggregator"
+                    Class "Slick.Data.Aggregators.Sum"
                     |=> Inherits (Aggregator t)
                     |+> [Constructor T<string>]
 
@@ -803,9 +810,9 @@ module Definition =
         Generic / fun t ->
             Class "Slick.Grid"
             |=> Grid_t
-            |+> [Constructor ((T<Element> + T<string>) *
-                              (Data.DataView t + Type.ArrayOf t) *
-                              Type.ArrayOf (Column t) *
+            |+> [Constructor ((T<Element> + T<string>)?container *
+                              (Data.DataView t + Type.ArrayOf t)?data *
+                              (Type.ArrayOf (Column t))?columns *
                               !?(Options t))]
             |+> Protocol [
                     "onActiveCellChanged" =? Event CellCoords
@@ -914,7 +921,7 @@ module Definition =
 
         let ColumnPickerOptions =
             Generic / fun t ->
-                Pattern.Config "Slick.ColumnPickerOptions" {
+                Pattern.Config "Slick.Controls.ColumnPickerOptions" {
                     Required = []
                     Optional =
                         [
@@ -924,7 +931,7 @@ module Definition =
 
         let ColumnPicker =
             Generic / fun (t: Type.Type) ->
-                Class "Slick.ColumnPicker"
+                Class "Slick.Controls.ColumnPicker"
                 |+> [Constructor (Type.ArrayOf (Column t) * Grid_t.[t] * (ColumnPickerOptions t + Options t))]
                 |+> Protocol [
                         "handleHeaderContextMenu" => T<Event> * T<obj> ^-> T<unit>
@@ -933,7 +940,7 @@ module Definition =
                     ]
 
         let NavState =
-            Class "Slick.NavState"
+            Class "Slick.Controls.NavState"
             |+> Protocol [
                     "canGotoFirst" => T<bool>
                     "canGotoLast" => T<bool>
@@ -944,7 +951,7 @@ module Definition =
 
         let Pager =
             Generic / fun t ->
-                Class "Slick.Pager"
+                Class "Slick.Controls.Pager"
                 |+> [Constructor (Data.DataView t * Grid t * T<JQuery>)]
                 |+> Protocol [
                         "getNavState" => T<unit> ^-> NavState
@@ -979,7 +986,7 @@ module Definition =
                 Res.Controls.PagerCss
                 Res.Controls.Pager
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid" [
+            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick" [
                 Box
                 AbsBox
                 AutoTooltipsOptions
@@ -1011,15 +1018,16 @@ module Definition =
                 Generic - Change
                 CheckboxSelectColumnOptions
                 Generic - CheckboxSelectColumn
+                |> Requires [Res.Plugins.Checkboxselectcolumn]
                 EditController
                 Position
                 Generic - EditorArgs
                 Generic - Editor
                 Generic - EditorEventArgs
                 EditorLock
-                Editors
+                Generic - Editors
                 |> Requires [Res.Editors]
-                Formatters
+                Generic - Formatters
                 |> Requires [Res.Formatters]
                 FromToRangesArgs
                 NonDataItem
@@ -1043,7 +1051,7 @@ module Definition =
                 Generic - Options
                 Generic - Grid
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Data" [
+            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Data" [
                 Generic - Data.Aggregator
                 Generic - Data.ColumnMetadata
                 Generic - Data.Metadata
@@ -1055,13 +1063,13 @@ module Definition =
                 Generic - Data.DataViewOptions
                 Generic - Data.DataView
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Data.Aggregators" [
+            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Data.Aggregators" [
                 Generic - Data.Aggregators.AvgAggregator
                 Generic - Data.Aggregators.MaxAggregator
                 Generic - Data.Aggregators.MinAggregator
                 Generic - Data.Aggregators.SumAggregator
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Controls" [
+            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Controls" [
                 Generic - Controls.ColumnPickerOptions
                 Generic - Controls.ColumnPicker
                 |> Requires [Res.Controls.Columnpicker]
