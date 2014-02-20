@@ -2,7 +2,7 @@
 open IntelliFactory.Build
 
 let bt =
-    BuildTool().PackageId("IntelliFactory.WebSharper.SlickGrid", "2.5")
+    BuildTool().PackageId("WebSharper.SlickGrid", "2.5")
 
 let resourceFiles =
     [
@@ -57,8 +57,13 @@ bt.Solution [
     // web
 
     bt.NuGet.CreatePackage()
+        .Configure(fun c ->
+            { c with
+                Title = Some "WebSharper.SlickGrid-2.2"
+                LicenseUrl = Some "http://websharper.com/licensing"
+                ProjectUrl = Some "https://github.com/intellifactory/websharper.slickgrid"
+                Description = "WebSharper Extensions for SlickGrids 2.2"
+                RequiresLicenseAcceptance = true })
         .Add(main)
-        .Description("SlickGrid bindings for WebSharper")
-
 ]
 |> bt.Dispatch
