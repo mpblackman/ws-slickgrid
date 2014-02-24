@@ -3,6 +3,7 @@ open IntelliFactory.Build
 
 let bt =
     BuildTool().PackageId("WebSharper.SlickGrid", "2.5")
+    |> fun bt -> bt.WithFramework(bt.Framework.Net40)
 
 let resourceFiles =
     [
