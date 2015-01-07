@@ -1,9 +1,9 @@
 ﻿namespace IntelliFactory.WebSharper.SlickGrid.Definition
 
 module Definition =
+    open IntelliFactory.WebSharper
     open IntelliFactory.WebSharper.InterfaceGenerator
-    open IntelliFactory.WebSharper.Dom
-    open IntelliFactory.WebSharper.EcmaScript
+    open IntelliFactory.WebSharper.JavaScript.Dom
     open IntelliFactory.WebSharper.JQuery
 
     module Res =
