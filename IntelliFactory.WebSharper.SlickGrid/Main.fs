@@ -77,7 +77,7 @@ module Definition =
 
     let Box =
         Class "Slick.Box"
-        |+> Protocol [
+        |+> Instance [
                 "height" =? T<int>
                 "width" =? T<int>
                 "visible" =? T<bool>
@@ -86,7 +86,7 @@ module Definition =
     let AbsBox =
         Class "Slick.AbsBox"
         |=> Inherits Box
-        |+> Protocol [
+        |+> Instance [
                 "bottom" =? T<int>
                 "left" =? T<int>
                 "right" =? T<int>
@@ -105,18 +105,18 @@ module Definition =
         }
 
     let AutoTooltips =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.AutoTooltips"
-            |+> [
+            |+> Static [
                     Constructor (!?AutoTooltipsOptions)
                 ]
-            |+> Protocol [
+            |+> Instance [
                     "destroy" => T<unit -> unit>
                     "init" => Grid_t.[t] ^-> T<unit>
                 ]
 
     let EditorGenerator =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.EditorGenerator"
 
     let ValidationResults =
@@ -136,7 +136,7 @@ module Definition =
     let Formatter (t: Type.IType) = (T<int> * T<int> * T<string> * Column_t.[t] * t) ^-> T<string>
 
     let Column =
-        Generic / fun t ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Pattern.Config "Slick.Column" {
                 Required =
                     [
@@ -148,7 +148,7 @@ module Definition =
                         "behavior", T<string>
                         "cannotTriggerInsert", T<bool>
                         "cssClass", T<string>
-                        "editor", (EditorGenerator t).Type
+                        "editor", EditorGenerator.[t]
                         "field", T<string>
                         "formatter", Formatter t
                         "headerCssClass", T<string>
@@ -164,29 +164,29 @@ module Definition =
                         "width", T<int>
                     ]
             }
-            |=> Column_t
+        |=> Column_t
 
     let BeforeEditCellEventArgs =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.BeforeEditCellEventArgs"
-            |+> Protocol [
+            |+> Instance [
                     "cell" =? T<int>
-                    "column" =? Column t
+                    "column" =? Column.[t]
                     "item" =? t
                     "row" =? T<int>
                 ]
 
     let BeforeMoveRowsArgs =
         Class "Slick.BeforeMoveRowsArgs"
-        |+> Protocol [
+        |+> Instance [
                 "insertBefore" =? T<int>
                 "rows" =? T<int[]>
             ]
 
     let CellChangeEventArgs =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.CellChangeEventArgs"
-            |+> Protocol [
+            |+> Instance [
                     "cell" =? T<int>
                     "item" =? t
                     "row" =? T<int>
@@ -203,9 +203,9 @@ module Definition =
         }
 
     let Event =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.Event"
-            |+> Protocol [
+            |+> Instance [
                     "notify" => t * !?T<Event> * !?T<obj> ^-> T<unit>
                     "subscribe" => (T<Event> * t ^-> T<unit>) ^-> T<unit>
                     "unsubscribe" => (T<Event> * t ^-> T<unit>) ^-> T<unit>
@@ -213,16 +213,16 @@ module Definition =
 
     let RangesArgs =
         Class "Slick.RangesArgs"
-        |+> Protocol [
+        |+> Instance [
                 "ranges" =? T<obj>
             ]
 
     let CellCopyManager =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.CellCopyManager"
-            |+> Protocol [
-                    "onCopyCancelled" =? Event RangesArgs
-                    "onCopyCells" =? Event RangesArgs
+            |+> Instance [
+                    "onCopyCancelled" =? Event.[RangesArgs]
+                    "onCopyCells" =? Event.[RangesArgs]
                     "clearCopySelection" => T<unit> ^-> T<unit>
                     "destroy" => T<unit> ^-> T<unit>
                     "init" => Grid_t.[t] ^-> T<unit>
@@ -230,17 +230,17 @@ module Definition =
 
     let CellCssEventArgs =
         Class "Slick.CellCssEventArgs"
-        |+> Protocol [
+        |+> Instance [
                 "hash" =? T<obj>
                 "key" =? T<string>
             ]
 
     let Range =
         Class "Slick.Range"
-        |+> [
+        |+> Static [
                 Constructor (T<int> * T<int> * T<int> * T<int>)
             ]
-        |+> Protocol [
+        |+> Instance [
                 "fromCell" =? T<int>
                 "fromRow" =? T<int>
                 "toCell" =? T<int>
@@ -259,10 +259,10 @@ module Definition =
         }
 
     let CellRangeDecorator =
-        Generic / fun (t: Type.Type) ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Class "Slick.CellRangeDecorator"
-            |+> [Constructor (Grid_t.[t] * !?CellRangeDecoratorOptions)]
-            |+> Protocol [
+            |+> Static [Constructor (Grid_t.[t] * !?CellRangeDecoratorOptions)]
+            |+> Instance [
                     "hide" => T<unit> ^-> T<unit>
                     "show" => Range ^-> T<JQuery>
                 ]
@@ -277,20 +277,20 @@ module Definition =
         }
 
     let CellRangeSelector =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.CellRangeSelector"
-            |+> [Constructor (!?CellRangeSelectorOptions)]
-            |+> Protocol [
-                    "onBeforeCellRangeSelected" =? Event CellCoords
-                    "onCellRangeSelected" =? Event Range
+            |+> Static [Constructor (!?CellRangeSelectorOptions)]
+            |+> Instance [
+                    "onBeforeCellRangeSelected" =? Event.[CellCoords]
+                    "onCellRangeSelected" =? Event.[Range]
                     "destroy" => T<unit -> unit>
                     "init" => Grid_t.[t] ^-> T<unit>
                 ]
 
     let SelectionModel =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.SelectionModel"
-            |+> Protocol [
+            |+> Instance [
                     "destroy" => T<unit -> unit>
                     "getSelectedRanges" => T<unit> ^-> Type.ArrayOf Range
                     "init" => Grid_t.[t] ^-> T<unit>
@@ -307,18 +307,18 @@ module Definition =
         }
 
     let CellSelectionModel =
-        Generic / fun t ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Class "Slick.CellSelectionModel"
-            |=> Inherits (SelectionModel t)
-            |+> [Constructor (!?CellSelectionModelOptions)]
+            |=> Inherits SelectionModel.[t]
+            |+> Static [Constructor (!?CellSelectionModelOptions)]
 
     let Change =
-        Generic / fun t ->
+        Generic - fun t ->
             Pattern.Config "Slick.Change" {
                 Required =
                     [
-                        "current", t
-                        "previous", t
+                        "current", t.Type
+                        "previous", t.Type
                     ]
                 Optional = []
             }
@@ -336,12 +336,12 @@ module Definition =
         }
 
     let CheckboxSelectColumn =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.CheckboxSelectColumn"
-            |+> [Constructor (!?CheckboxSelectColumnOptions)]
-            |+> Protocol [
+            |+> Static [Constructor (!?CheckboxSelectColumnOptions)]
+            |+> Instance [
                     "destroy" => T<unit -> unit>
-                    "getColumnDefinition" => T<unit> ^-> Column t
+                    "getColumnDefinition" => T<unit> ^-> Column.[t]
                     "init" => Grid_t.[t] ^-> T<unit>
                 ]
 
@@ -363,10 +363,10 @@ module Definition =
         }
 
     let EditorArgs =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.EditorArgs"
-            |+> Protocol [
-                    "column" =? Column t
+            |+> Instance [
+                    "column" =? Column.[t]
                     "container" =? T<Element>
                     "position" =? Position
                     "cancelChanges" => T<unit -> unit>
@@ -375,7 +375,7 @@ module Definition =
 
     let Editor =
         let Editor_t = Type.New()
-        Generic / fun t ->
+        Generic - fun t ->
             Pattern.Config "Slick.Editor" {
                 Required =
                     [
@@ -390,26 +390,26 @@ module Definition =
                 Optional = []
             }
             |=> Editor_t
-            |+> Protocol [
-                    "create" => (EditorArgs t ^-> Editor_t.[t]) ^-> EditorGenerator t
+            |+> Instance [
+                    "create" => (EditorArgs.[t] ^-> Editor_t.[t]) ^-> EditorGenerator.[t]
                 ]
 
     let EditorEventArgs =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.EditorEventArgs"
-            |+> Protocol [
-                    "editor" =? Editor t
+            |+> Instance [
+                    "editor" =? Editor.[t]
                 ]
 
     let EditorLock =
         let EditorLock_t = Type.New()
         Class "Slick.EditorLock"
         |=> EditorLock_t
-        |+> [
+        |+> Static [
                 Constructor T<unit>
                 "global" =? EditorLock_t
             ]
-        |+> Protocol [
+        |+> Instance [
                 "activate" => EditController ^-> T<unit>
                 "cancelCurrentEdit" => T<unit -> bool>
                 "commitCurrentEdit" => T<unit -> bool>
@@ -418,22 +418,22 @@ module Definition =
             ]
 
     let Editors =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.Editors"
-            |+> [
-                    "Checkbox" =? EditorGenerator t
-                    "Date" =? EditorGenerator t
-                    "Integer" =? EditorGenerator t
-                    "LongText" =? EditorGenerator t
-                    "PercentComplete" =? EditorGenerator t
-                    "Text" =? EditorGenerator t
-                    "YesNoSelect" =? EditorGenerator t
+            |+> Static [
+                    "Checkbox" =? EditorGenerator.[t]
+                    "Date" =? EditorGenerator.[t]
+                    "Integer" =? EditorGenerator.[t]
+                    "LongText" =? EditorGenerator.[t]
+                    "PercentComplete" =? EditorGenerator.[t]
+                    "Text" =? EditorGenerator.[t]
+                    "YesNoSelect" =? EditorGenerator.[t]
                 ]
 
     let Formatters =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.Formatters"
-            |+> [
+            |+> Static [
                     "Checkmark" =? Formatter t
                     "PercentComplete" =? Formatter t
                     "PercentCompleteBar" =? Formatter t
@@ -442,7 +442,7 @@ module Definition =
 
     let FromToRangesArgs =
         Class "Slick.FromToRangesArgs"
-        |+> Protocol [
+        |+> Instance [
                 "from" =? T<obj>
                 "to" =? T<obj>
             ]
@@ -453,7 +453,7 @@ module Definition =
         Interface "Slick.NonDataItem"
 
     let GroupTotals =
-        Generic / fun (t: Type.Type) ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Pattern.Config "Slick.GroupTotals" {
                 Required = []
                 Optional =
@@ -464,7 +464,7 @@ module Definition =
             |=> Implements [NonDataItem]
 
     let Group =
-        Generic / fun t ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Pattern.Config "Slick.Group" {
                 Required = []
                 Optional =
@@ -472,7 +472,7 @@ module Definition =
                         "collapsed", T<bool>
                         "count", T<int>
                         "title", T<string>
-                        "totals", (GroupTotals t).Type
+                        "totals", GroupTotals.[t]
                         "value", T<string>
                     ]
             }
@@ -480,41 +480,41 @@ module Definition =
             |=> Implements [NonDataItem]
 
     let HeaderEventArgs =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.HeaderEventArgs"
-            |+> Protocol [
-                    "column" =? Column t
+            |+> Instance [
+                    "column" =? Column.[t]
                 ]
 
     let IEditorFactory =
-        Generic / fun t ->
+        Generic - fun t ->
             Interface "Slick.IEditorFactory"
             |+> [
-                    "getEditor" => Column t ^-> Editor t
+                    "getEditor" => Column.[t] ^-> Editor.[t]
                 ]
 
     let IFormatterFactory =
-        Generic / fun t ->
+        Generic - fun t ->
             Interface "Slick.IFormatterFactory"
             |+> [
-                    "getFormatter" => Column t ^-> Formatter t
+                    "getFormatter" => Column.[t] ^-> Formatter t
                 ]
 
     let NewRowEventArgs =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.NewRowEventArgs"
-            |+> Protocol [
-                    "column" =? Column t
+            |+> Instance [
+                    "column" =? Column.[t]
                     "item" =? t
                 ]
 
     let RowMoveManager =
-        Generic / fun t ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Class "Slick.RowMoveManager"
-            |+> [Constructor T<unit>]
-            |+> Protocol [
-                    "onBeforeMoveRows" =? Event BeforeMoveRowsArgs
-                    "onMoveRows" =? Event BeforeMoveRowsArgs
+            |+> Static [Constructor T<unit>]
+            |+> Instance [
+                    "onBeforeMoveRows" =? Event.[BeforeMoveRowsArgs]
+                    "onMoveRows" =? Event.[BeforeMoveRowsArgs]
                     "destroy" => T<unit -> unit>
                     "init" => Grid_t.[t] ^-> T<unit>
                 ]
@@ -529,24 +529,24 @@ module Definition =
         }
 
     let RowSelectionModel =
-        Generic / fun t ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Class "Slick.RowSelectionModel"
-            |=> Inherits (SelectionModel t)
-            |+> [Constructor (!?RowSelectionModelOptions)]
-            |+> Protocol [
+            |=> Inherits SelectionModel.[t]
+            |+> Static [Constructor (!?RowSelectionModelOptions)]
+            |+> Instance [
                     "getSelectedRows" => T<unit -> int[]>
                     "setSelectedRows" => T<int[] -> unit>
                 ]
 
     let RowsEventArgs =
         Class "Slick.RowsEventArgs"
-        |+> Protocol [
+        |+> Instance [
                 "rows" =? T<int[]>
             ]
 
     let ScrollEventArgs =
         Class "Slick.ScrollEventArgs"
-        |+> Protocol [
+        |+> Instance [
                 "scrollLeft" =? T<int>
                 "scrollTop" =? T<int>
             ]
@@ -562,36 +562,36 @@ module Definition =
         }
 
     let SortEventArgs =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.SortEventArgs"
-            |+> Protocol [
+            |+> Instance [
                     "multiColumnSort" =? T<bool>
                     "sortAsc" =? T<bool>
-                    "sortCol" =? Column t
+                    "sortCol" =? Column.[t]
                     "sortCols" =? Type.ArrayOf SortColumn
                 ]
 
     let ValidationError =
-        Generic / fun t ->
+        Generic - fun t ->
             Class "Slick.ValidationError"
-            |+> Protocol [
+            |+> Instance [
                     "cell" =? T<int>
                     "cellNode" =? T<Element>
-                    "column" =? Column t
-                    "editor" =? Editor t
+                    "column" =? Column.[t]
+                    "editor" =? Editor.[t]
                     "row" =? T<int>
                     "validationResults" =? ValidationResults
                 ]
 
     let VerticalRange =
         Class "Slick.VerticalRange"
-        |+> Protocol [
+        |+> Instance [
                 "bottom" =? T<int>
                 "top" =? T<int>
             ]
 
     let Options =
-        Generic / fun t ->
+        Generic - fun t ->
             Pattern.Config "Slick.Options" {
                 Required = []
                 Optional =
@@ -605,8 +605,8 @@ module Definition =
                         "cellHighlightCssClass", T<string>
                         "defaultColumnWidth", T<int>
                         "editable", T<bool>
-                        "editCommandHandler", (t * Column t * T<obj>) ^-> T<unit>
-                        "editorFactory", (IEditorFactory t).Type
+                        "editCommandHandler", (t * Column.[t] * T<obj>) ^-> T<unit>
+                        "editorFactory", IEditorFactory.[t]
                         "editorLock", EditorLock.Type
                         "enableAddRow", T<bool>
                         "enableAsyncPostRender", T<bool>
@@ -617,7 +617,7 @@ module Definition =
                         "enableTextSelectionOnCells", T<bool>
                         "explicitInitialization", T<bool>
                         "forceFitColumns", T<bool>
-                        "formatterFactory", (IFormatterFactory t).Type
+                        "formatterFactory", IFormatterFactory.[t]
                         "headerRowHeight", T<int>
                         "leaveSpaceForNewRows", T<bool>
                         "multiColumnSort", T<bool>
@@ -631,35 +631,35 @@ module Definition =
     module Data =
 
         let Aggregator =
-            Generic / fun t ->
+            Generic - fun t ->
                 Class "Slick.Data.Aggregator"
-                |+> Protocol [
+                |+> Instance [
                         "accumulate" => t ^-> T<unit>
                         "init" => T<unit -> unit>
                         "storeResult" => T<obj -> unit>
                     ]
 
         let ColumnMetadata =
-            Generic / fun t ->
+            Generic - fun t ->
                 Pattern.Config "Slick.Data.ColumnMetadata" {
                     Required = []
                     Optional =
                         [
                             "colspan", T<string>
-                            "editor", (Editor t).Type
+                            "editor", Editor.[t]
                             "formatter", Formatter t
                         ]
                 }
 
         let Metadata =
-            Generic / fun t ->
+            Generic - fun t ->
                 Pattern.Config "Slick.Data.Metadata" {
                     Required = []
                     Optional =
                         [
-                            "columns", Type.ArrayOf (ColumnMetadata t)
+                            "columns", Type.ArrayOf ColumnMetadata.[t]
                             "cssClasses", T<string>
-                            "editor", (Editor t).Type
+                            "editor", Editor.[t]
                             "focusable", T<bool>
                             "formatter", Formatter t
                             "selectable", T<bool>
@@ -683,19 +683,19 @@ module Definition =
             }
 
         let GroupItemMetadataProvider =
-            Generic / fun t ->
+            Generic - fun t ->
                 Class "Slick.Data.GroupItemMetadataProvider"
-                |+> [Constructor (!?GroupItemMetadataProviderOptions)]
-                |+> Protocol [
+                |+> Static [Constructor (!?GroupItemMetadataProviderOptions)]
+                |+> Instance [
                         "destroy" => T<unit -> unit>
-                        "getGroupRowMetadata" => t ^-> Metadata t
-                        "getTotalsRowMetadata" => t ^-> Metadata t
+                        "getGroupRowMetadata" => t ^-> Metadata.[t]
+                        "getTotalsRowMetadata" => t ^-> Metadata.[t]
                         "init" => Grid_t.[t] ^-> T<unit>
                     ]
 
         let PagingInfo =
             Class "Slick.Data.PagingInfo"
-            |+> Protocol [
+            |+> Instance [
                     "pageNum" =? T<int>
                     "pageSize" =? T<int>
                     "totalPages" =? T<int>
@@ -726,25 +726,25 @@ module Definition =
             }
 
         let DataViewOptions =
-            Generic / fun t ->
+            Generic - fun t ->
                 Pattern.Config "Slick.Data.DataViewOptions" {
                     Required = []
                     Optional =
                         [
-                            "groupItemMetadataProvider", (GroupItemMetadataProvider t).Type
+                            "groupItemMetadataProvider", GroupItemMetadataProvider.[t]
                             "inlineFilters", T<bool>
                         ]
                 }
                 
 
         let DataView =
-            Generic / fun t ->
+            Generic - fun (t: CodeModel.TypeParameter) ->
                 Class "Slick.Data.DataView"
-                |+> [Constructor (!?(DataViewOptions t))]
-                |+> Protocol [
-                        "onPagingInfoChanged" =? Event PagingInfo
-                        "onRowCountChanged" =? Event (Change T<int>)
-                        "onRowsChanged" =? Event RowsEventArgs
+                |+> Static [Constructor !?DataViewOptions.[t]]
+                |+> Instance [
+                        "onPagingInfoChanged" =? Event.[PagingInfo]
+                        "onRowCountChanged" =? Event.[Change.[T<int>]]
+                        "onRowsChanged" =? Event.[RowsEventArgs]
                         "addItem" => t ^-> T<unit>
                         "beginUpdate" => T<unit -> unit>
                         "collapseGroup" => T<string -> unit>
@@ -752,23 +752,23 @@ module Definition =
                         "endUpdate" => T<unit -> unit>
                         "expandGroup" => T<string -> unit>
                         "fastSort" => (T<string> + T<unit -> obj>) * T<bool> ^-> T<unit>
-                        "getGroups" => T<unit> ^-> Type.ArrayOf (Group t)
+                        "getGroups" => T<unit> ^-> Type.ArrayOf Group.[t]
                         "getIdxById" => T<string -> int>
                         "getItem" => T<int> ^-> t
                         "getItemById" => T<string> ^-> t
                         "getItemByIdx" => T<int> ^-> t
-                        "getItemMetadata" => T<int> ^-> Metadata t
+                        "getItemMetadata" => T<int> ^-> Metadata.[t]
                         "getItems" => Type.ArrayOf t
                         "getLength" => T<unit -> int>
                         "getPagingInfo" => T<unit> ^-> PagingInfo
                         "getRowById" => T<string -> int>
-                        "groupBy" => (T<string> + (t ^-> T<obj>)) * (Group t ^-> T<string>) * (Group t * Group t ^-> T<int>) ^-> T<unit>
+                        "groupBy" => (T<string> + (t ^-> T<obj>)) * (Group.[t] ^-> T<string>) * (Group.[t] * Group.[t] ^-> T<int>) ^-> T<unit>
                         "insertItem" => T<int> * t ^-> T<unit>
                         "mapIdsToRows" => T<string[] -> int[]>
                         "mapRowsToIds" => T<int[] -> string[]>
                         "refresh" => T<unit -> unit>
                         "reSort" => T<unit -> unit>
-                        "setAggregators" => Type.ArrayOf (Aggregator t) * T<bool> ^-> T<unit>
+                        "setAggregators" => Type.ArrayOf Aggregator.[t] * T<bool> ^-> T<unit>
                         Generic - fun t' -> "setFilter" => (t * t' ^-> T<bool>) ^-> T<unit>
                         Generic - fun t' -> "setFilterArgs" => t' ^-> T<unit>
                         "setItems" => Type.ArrayOf t * !?T<string> ^-> T<unit>
@@ -783,65 +783,65 @@ module Definition =
         module Aggregators =
 
             let AvgAggregator =
-                Generic / fun t ->
+                Generic - fun (t: CodeModel.TypeParameter) ->
                     Class "Slick.Data.Aggregators.Avg"
-                    |=> Inherits (Aggregator t)
-                    |+> [Constructor T<string>]
+                    |=> Inherits Aggregator.[t]
+                    |+> Static [Constructor T<string>]
 
             let MaxAggregator =
-                Generic / fun t ->
+                Generic - fun (t: CodeModel.TypeParameter) ->
                     Class "Slick.Data.Aggregators.Max"
-                    |=> Inherits (Aggregator t)
-                    |+> [Constructor T<string>]
+                    |=> Inherits Aggregator.[t]
+                    |+> Static [Constructor T<string>]
 
             let MinAggregator =
-                Generic / fun t ->
+                Generic - fun (t: CodeModel.TypeParameter) ->
                     Class "Slick.Data.Aggregators.Min"
-                    |=> Inherits (Aggregator t)
-                    |+> [Constructor T<string>]
+                    |=> Inherits Aggregator.[t]
+                    |+> Static [Constructor T<string>]
 
             let SumAggregator =
-                Generic / fun t ->
+                Generic - fun (t: CodeModel.TypeParameter) ->
                     Class "Slick.Data.Aggregators.Sum"
-                    |=> Inherits (Aggregator t)
-                    |+> [Constructor T<string>]
+                    |=> Inherits Aggregator.[t]
+                    |+> Static [Constructor T<string>]
 
     let Grid =
-        Generic / fun t ->
+        Generic - fun (t: CodeModel.TypeParameter) ->
             Class "Slick.Grid"
             |=> Grid_t
-            |+> [Constructor ((T<Element> + T<string>)?container *
-                              (Data.DataView t + Type.ArrayOf t)?data *
-                              (Type.ArrayOf (Column t))?columns *
-                              !?(Options t))]
-            |+> Protocol [
-                    "onActiveCellChanged" =? Event CellCoords
-                    "onActiveCellPositionChanged" =? Event T<unit>
-                    "onAddNewRow" =? Event (NewRowEventArgs t)
-                    "onBeforeCellEditorDestroy" =? Event (EditorEventArgs t)
-                    "onBeforeDestroy" =? Event T<unit>
-                    "onBeforeEditCell" =? Event (BeforeEditCellEventArgs t)
-                    "onCellChange" =? Event (CellChangeEventArgs t)
-                    "onCellCssStylesChanged" =? Event CellCssEventArgs
-                    "onClick" =? Event CellCoords
-                    "onColumnsReordered" =? Event T<unit>
-                    "onColumnsResized" =? Event T<unit>
-                    "onContextMenu" =? Event T<unit>
-                    "onDblClick" =? Event CellCoords
-                    "onDrag" =? Event T<obj>
-                    "onDragEnd" =? Event T<obj>
-                    "onDragInit" =? Event T<obj>
-                    "onDragStart" =? Event T<obj>
-                    "onHeaderClick" =? Event (HeaderEventArgs t)
-                    "onHeaderContextMenu" =? Event (HeaderEventArgs t)
-                    "onKeyDown" =? Event CellCoords
-                    "onMouseEnter" =? Event T<unit>
-                    "onMouseLeave" =? Event T<unit>
-                    "onScroll" =? Event ScrollEventArgs
-                    "onSelectedRangesChanged" =? Event RowsEventArgs
-                    "onSort" =? Event (SortEventArgs t)
-                    "onValidationError" =? Event (ValidationError t)
-                    "onViewportChanged" =? Event T<unit>
+            |+> Static [Constructor ((T<Element> + T<string>)?container *
+                              (Data.DataView.[t] + Type.ArrayOf t)?data *
+                              (Type.ArrayOf Column.[t])?columns *
+                              !?Options.[t])]
+            |+> Instance [
+                    "onActiveCellChanged" =? Event.[CellCoords]
+                    "onActiveCellPositionChanged" =? Event.[T<unit>]
+                    "onAddNewRow" =? Event.[NewRowEventArgs.[t]]
+                    "onBeforeCellEditorDestroy" =? Event.[EditorEventArgs.[t]]
+                    "onBeforeDestroy" =? Event.[T<unit>]
+                    "onBeforeEditCell" =? Event.[BeforeEditCellEventArgs.[t]]
+                    "onCellChange" =? Event.[CellChangeEventArgs.[t]]
+                    "onCellCssStylesChanged" =? Event.[CellCssEventArgs]
+                    "onClick" =? Event.[CellCoords]
+                    "onColumnsReordered" =? Event.[T<unit>]
+                    "onColumnsResized" =? Event.[T<unit>]
+                    "onContextMenu" =? Event.[T<unit>]
+                    "onDblClick" =? Event.[CellCoords]
+                    "onDrag" =? Event.[T<obj>]
+                    "onDragEnd" =? Event.[T<obj>]
+                    "onDragInit" =? Event.[T<obj>]
+                    "onDragStart" =? Event.[T<obj>]
+                    "onHeaderClick" =? Event.[HeaderEventArgs.[t]]
+                    "onHeaderContextMenu" =? Event.[HeaderEventArgs.[t]]
+                    "onKeyDown" =? Event.[CellCoords]
+                    "onMouseEnter" =? Event.[T<unit>]
+                    "onMouseLeave" =? Event.[T<unit>]
+                    "onScroll" =? Event.[ScrollEventArgs]
+                    "onSelectedRangesChanged" =? Event.[RowsEventArgs]
+                    "onSort" =? Event.[SortEventArgs.[t]]
+                    "onValidationError" =? Event.[ValidationError.[t]]
+                    "onViewportChanged" =? Event.[T<unit>]
                     "slickGridVersion" =? T<string>
                     // methods
                     "addCellCssStyles" => T<string> * T<obj> ^-> T<unit>
@@ -849,7 +849,7 @@ module Definition =
                     "canCellBeActive" => T<int> * T<int> ^-> T<bool>
                     "canCellBeSelected" => T<int> * T<int> ^-> T<bool>
                     "destroy" => T<unit -> unit>
-                    "editActiveCell" => !?(Editor t) ^-> T<unit>
+                    "editActiveCell" => !?Editor.[t] ^-> T<unit>
                     "finishInitialization" => T<unit -> unit>
                     "flashCell" => T<int>?x * T<int>?y * !?T<int> ^-> T<unit>
                     "focus" => T<unit -> unit>
@@ -858,13 +858,13 @@ module Definition =
                     "getActiveCellPosition" => T<unit> ^-> AbsBox
                     "getCanvasNode" => T<unit -> JQuery>
                     "getCellCssStyles" => T<string -> obj>
-                    "getCellEditor" => Editor t
+                    "getCellEditor" => Editor.[t]
                     "getCellFromEvent" => T<Event> ^-> CellCoords
                     "getCellFromPoint" => T<int> * T<int> ^-> CellCoords
                     "getCellNode" => T<int> * T<int> ^-> T<Element>
                     "getCellNodeBox" => T<int> * T<int> ^-> Box
                     "getColumnIndex" => T<string -> int>
-                    "getColumns" => T<unit> ^-> Type.ArrayOf (Column t)
+                    "getColumns" => T<unit> ^-> Type.ArrayOf Column.[t]
                     "getData" => Type.ArrayOf t
                     "getDataItem" => T<int> ^-> t
                     "getDataLength" => T<unit -> int>
@@ -873,10 +873,10 @@ module Definition =
                     "getGridPosition" => T<unit> ^-> AbsBox
                     "getHeaderRow" => T<unit -> JQuery>
                     "getHeaderRowColumn" => T<int -> Element>
-                    "getOptions" => T<unit> ^-> Options t
+                    "getOptions" => T<unit> ^-> Options.[t]
                     "getRenderedRange" => !?T<int> ^-> VerticalRange
                     "getSelectedRows" => T<unit -> int[]>
-                    "getSelectionModel" => T<unit> ^-> SelectionModel t
+                    "getSelectionModel" => T<unit> ^-> SelectionModel.[t]
                     "getSortColumns" => Type.ArrayOf SortColumn
                     "getTopPanel" => T<unit -> JQuery>
                     "getViewport" => !?T<int> ^-> VerticalRange
@@ -901,11 +901,11 @@ module Definition =
                     "scrollRowIntoView" => T<int> * T<bool> ^-> T<unit>
                     "setActiveCell" => T<int> * T<int> ^-> T<unit>
                     "setCellCssStyles" => T<string> * T<obj> ^-> T<unit>
-                    "setColumns" => Type.ArrayOf (Column t) ^-> T<unit>
+                    "setColumns" => Type.ArrayOf Column.[t] ^-> T<unit>
                     "setData" => Type.ArrayOf t * !?T<bool> ^-> T<unit>
-                    "setOptions" => Options t ^-> T<unit>
+                    "setOptions" => Options.[t] ^-> T<unit>
                     "setSelectedRows" => T<int[] -> unit>
-                    "setSelectionModel" => SelectionModel t ^-> T<unit>
+                    "setSelectionModel" => SelectionModel.[t] ^-> T<unit>
                     "setSortColumn" => T<string> * T<bool> ^-> T<unit>
                     "setSortColumns" => Type.ArrayOf SortColumn ^-> T<unit>
                     "showHeaderRowColumns" => T<unit -> unit>
@@ -920,7 +920,7 @@ module Definition =
     module Controls =
 
         let ColumnPickerOptions =
-            Generic / fun t ->
+            Generic - fun (t: CodeModel.TypeParameter) ->
                 Pattern.Config "Slick.Controls.ColumnPickerOptions" {
                     Required = []
                     Optional =
@@ -930,10 +930,10 @@ module Definition =
                 }
 
         let ColumnPicker =
-            Generic / fun (t: Type.Type) ->
+            Generic - fun (t: CodeModel.TypeParameter) ->
                 Class "Slick.Controls.ColumnPicker"
-                |+> [Constructor (Type.ArrayOf (Column t) * Grid_t.[t] * (ColumnPickerOptions t + Options t))]
-                |+> Protocol [
+                |+> Static [Constructor (Type.ArrayOf Column.[t] * Grid_t.[t] * ColumnPickerOptions.[t] + Options.[t])]
+                |+> Instance [
                         "handleHeaderContextMenu" => T<Event> * T<obj> ^-> T<unit>
                         "init" => T<unit -> unit>
                         "updateColumn" => T<Event> ^-> T<unit>
@@ -941,7 +941,7 @@ module Definition =
 
         let NavState =
             Class "Slick.Controls.NavState"
-            |+> Protocol [
+            |+> Instance [
                     "canGotoFirst" => T<bool>
                     "canGotoLast" => T<bool>
                     "canGotoNext" => T<bool>
@@ -950,10 +950,10 @@ module Definition =
                 ]
 
         let Pager =
-            Generic / fun t ->
+            Generic - fun (t: CodeModel.TypeParameter) ->
                 Class "Slick.Controls.Pager"
-                |+> [Constructor (Data.DataView t * Grid t * T<JQuery>)]
-                |+> Protocol [
+                |+> Static [Constructor (Data.DataView.[t] * Grid.[t] * T<JQuery>)]
+                |+> Instance [
                         "getNavState" => T<unit> ^-> NavState
                         "gotoFirst" => T<unit -> unit>
                         "gotoLast" => T<unit -> unit>
@@ -990,91 +990,91 @@ module Definition =
                 Box
                 AbsBox
                 AutoTooltipsOptions
-                Generic - AutoTooltips
+                AutoTooltips
                 |> Requires [Res.Plugins.Autotooltips]
-                Generic - EditorGenerator
+                EditorGenerator
                 ValidationResults
-                Generic - Column
-                Generic - BeforeEditCellEventArgs
+                Column
+                BeforeEditCellEventArgs
                 BeforeMoveRowsArgs
-                Generic - CellChangeEventArgs
+                CellChangeEventArgs
                 CellCoords
-                Generic - Event
+                Event
                 RangesArgs
-                Generic - CellCopyManager
+                CellCopyManager
                 |> Requires [Res.Plugins.Cellcopymanager]
                 CellCssEventArgs
                 Range
                 CellRangeDecoratorOptions
-                Generic - CellRangeDecorator
+                CellRangeDecorator
                 |> Requires [Res.Plugins.Cellrangedecorator]
                 CellRangeSelectorOptions
-                Generic - CellRangeSelector
+                CellRangeSelector
                 |> Requires [Res.Plugins.Cellrangeselector]
-                Generic - SelectionModel
+                SelectionModel
                 CellSelectionModelOptions
-                Generic - CellSelectionModel
+                CellSelectionModel
                 |> Requires [Res.Plugins.Cellselectionmodel]
-                Generic - Change
+                Change
                 CheckboxSelectColumnOptions
-                Generic - CheckboxSelectColumn
+                CheckboxSelectColumn
                 |> Requires [Res.Plugins.Checkboxselectcolumn]
                 EditController
                 Position
-                Generic - EditorArgs
-                Generic - Editor
-                Generic - EditorEventArgs
+                EditorArgs
+                Editor
+                EditorEventArgs
                 EditorLock
-                Generic - Editors
+                Editors
                 |> Requires [Res.Editors]
-                Generic - Formatters
+                Formatters
                 |> Requires [Res.Formatters]
                 FromToRangesArgs
                 NonDataItem
-                Generic - GroupTotals
-                Generic - Group
-                Generic - HeaderEventArgs
-                Generic - IEditorFactory
-                Generic - IFormatterFactory
-                Generic - NewRowEventArgs
-                Generic - RowMoveManager
+                GroupTotals
+                Group
+                HeaderEventArgs
+                IEditorFactory
+                IFormatterFactory
+                NewRowEventArgs
+                RowMoveManager
                 |> Requires [Res.Plugins.Rowmovemanager]
                 RowSelectionModelOptions
-                Generic - RowSelectionModel
+                RowSelectionModel
                 |> Requires [Res.Plugins.Rowselectionmodel]
                 RowsEventArgs
                 ScrollEventArgs
                 SortColumn
-                Generic - SortEventArgs
-                Generic - ValidationError
+                SortEventArgs
+                ValidationError
                 VerticalRange
-                Generic - Options
-                Generic - Grid
+                Options
+                Grid
             ]
             Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Data" [
-                Generic - Data.Aggregator
-                Generic - Data.ColumnMetadata
-                Generic - Data.Metadata
+                Data.Aggregator
+                Data.ColumnMetadata
+                Data.Metadata
                 Data.GroupItemMetadataProviderOptions
-                Generic - Data.GroupItemMetadataProvider
+                Data.GroupItemMetadataProvider
                 Data.PagingInfo
                 Data.PagingOptions
                 Data.RefreshHints
-                Generic - Data.DataViewOptions
-                Generic - Data.DataView
+                Data.DataViewOptions
+                Data.DataView
             ]
             Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Data.Aggregators" [
-                Generic - Data.Aggregators.AvgAggregator
-                Generic - Data.Aggregators.MaxAggregator
-                Generic - Data.Aggregators.MinAggregator
-                Generic - Data.Aggregators.SumAggregator
+                Data.Aggregators.AvgAggregator
+                Data.Aggregators.MaxAggregator
+                Data.Aggregators.MinAggregator
+                Data.Aggregators.SumAggregator
             ]
             Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Controls" [
-                Generic - Controls.ColumnPickerOptions
-                Generic - Controls.ColumnPicker
+                Controls.ColumnPickerOptions
+                Controls.ColumnPicker
                 |> Requires [Res.Controls.Columnpicker]
                 Controls.NavState
-                Generic - Controls.Pager
+                Controls.Pager
                 |> Requires [Res.Controls.Pager]
             ]
         ]
