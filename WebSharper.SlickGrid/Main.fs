@@ -1,10 +1,10 @@
-﻿namespace IntelliFactory.WebSharper.SlickGrid.Definition
+﻿namespace WebSharper.SlickGrid.Definition
 
 module Definition =
-    open IntelliFactory.WebSharper
-    open IntelliFactory.WebSharper.InterfaceGenerator
-    open IntelliFactory.WebSharper.JavaScript.Dom
-    open IntelliFactory.WebSharper.JQuery
+    open WebSharper
+    open WebSharper.InterfaceGenerator
+    open WebSharper.JavaScript.Dom
+    open WebSharper.JQuery
 
     module Res =
 
@@ -965,7 +965,7 @@ module Definition =
 
     let Assembly =
         Assembly [
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Resources" [
+            Namespace "WebSharper.SlickGrid.Resources" [
                 Res.JQueryEventDrag
                 Res.Core
                 Res.Css
@@ -986,7 +986,7 @@ module Definition =
                 Res.Controls.PagerCss
                 Res.Controls.Pager
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick" [
+            Namespace "WebSharper.SlickGrid.Slick" [
                 Box
                 AbsBox
                 AutoTooltipsOptions
@@ -1051,7 +1051,7 @@ module Definition =
                 Options
                 Grid
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Data" [
+            Namespace "WebSharper.SlickGrid.Slick.Data" [
                 Data.Aggregator
                 Data.ColumnMetadata
                 Data.Metadata
@@ -1063,13 +1063,13 @@ module Definition =
                 Data.DataViewOptions
                 Data.DataView
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Data.Aggregators" [
+            Namespace "WebSharper.SlickGrid.Slick.Data.Aggregators" [
                 Data.Aggregators.AvgAggregator
                 Data.Aggregators.MaxAggregator
                 Data.Aggregators.MinAggregator
                 Data.Aggregators.SumAggregator
             ]
-            Namespace "IntelliFactory.WebSharper.SlickGrid.Slick.Controls" [
+            Namespace "WebSharper.SlickGrid.Slick.Controls" [
                 Controls.ColumnPickerOptions
                 Controls.ColumnPicker
                 |> Requires [Res.Controls.Columnpicker]
@@ -1079,7 +1079,7 @@ module Definition =
             ]
         ]
 
-open IntelliFactory.WebSharper.InterfaceGenerator
+open WebSharper.InterfaceGenerator
 
 [<Sealed>]
 type SlickExtension() =

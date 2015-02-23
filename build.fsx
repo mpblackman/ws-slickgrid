@@ -29,7 +29,7 @@ let resourceFiles =
     ]
 
 let main =
-    bt.WebSharper.Extension("IntelliFactory.WebSharper.SlickGrid")
+    bt.WebSharper.Extension("WebSharper.SlickGrid")
         .SourcesFromProject()
         .Embed(resourceFiles)
 
