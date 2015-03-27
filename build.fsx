@@ -8,18 +8,25 @@ let bt =
 let resourceFiles =
     [
         "SlickGrid/lib/jquery.event.drag-2.2.js"
+        "SlickGrid/lib/jquery.event.drop-2.2.js"
         "SlickGrid/slick.grid.css"
         "SlickGrid/slick.grid.js"
         "SlickGrid/slick.core.js"
         "SlickGrid/slick.dataview.js"
         "SlickGrid/slick.editors.js"
         "SlickGrid/slick.formatters.js"
+        "SlickGrid/slick.groupitemmetadataprovider.js"
+        "SlickGrid/slick-default-theme.css"
         "SlickGrid/plugins/slick.autotooltips.js"
         "SlickGrid/plugins/slick.cellcopymanager.js"
         "SlickGrid/plugins/slick.cellrangedecorator.js"
         "SlickGrid/plugins/slick.cellrangeselector.js"
         "SlickGrid/plugins/slick.cellselectionmodel.js"
         "SlickGrid/plugins/slick.checkboxselectcolumn.js"
+        "SlickGrid/plugins/slick.headerbuttons.css"
+        "SlickGrid/plugins/slick.headerbuttons.js"
+        "SlickGrid/plugins/slick.headermenu.css"
+        "SlickGrid/plugins/slick.headermenu.js"
         "SlickGrid/plugins/slick.rowmovemanager.js"
         "SlickGrid/plugins/slick.rowselectionmodel.js"
         "SlickGrid/controls/slick.columnpicker.css"
@@ -32,6 +39,7 @@ let main =
     bt.WebSharper.Extension("WebSharper.SlickGrid")
         .SourcesFromProject()
         .Embed(resourceFiles)
+        .References(fun rt ->[rt.NuGet("WebSharper.JQueryUi").Reference()])
 
 // let website =
 //     bt.WebSharper.Library("Website")

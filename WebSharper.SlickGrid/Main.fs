@@ -5,33 +5,48 @@ module Definition =
     open WebSharper.InterfaceGenerator
     open WebSharper.JavaScript.Dom
     open WebSharper.JQuery
+    open WebSharper
 
     module Res =
 
         let JQueryEventDrag =
             (Resource "JQueryEventDrag" "jquery.event.drag-2.2.js").AssemblyWide()
 
-        let Core =
-            (Resource "Core" "slick.core.js").AssemblyWide()
-            |> Requires [JQueryEventDrag]
+        let JQueryEventDrop =
+            (Resource "JQueryEventDrop" "jquery.event.drop-2.2.js").AssemblyWide()
 
         let Css =
             (Resource "Css" "slick.grid.css").AssemblyWide()
+            |> RequiresExternal [T<JQueryUI.Dependencies.JQueryUICss>]
+
+        let Core =
+            (Resource "Core" "slick.core.js").AssemblyWide()
+            |> Requires [JQueryEventDrag; JQueryEventDrop; Css]
+            |> RequiresExternal [T<JQuery.Resources.JQuery>]
+
+        let DefaultTheme =
+            (Resource "DefaultTheme" "slick-default-theme.css").AssemblyWide()
+            |> Requires [Css]
 
         let Js =
             (Resource "Js" "slick.grid.js").AssemblyWide()
-            |> Requires [Css; Core]
+            |> Requires [Core]
+            |> RequiresExternal [T<JQueryUI.Dependencies.JQueryUIJs>]
 
         let Dataview =
-            (Resource "Dataview" "slick.dataview.js").AssemblyWide()
+            Resource "Dataview" "slick.dataview.js"
             |> Requires [Js]
 
         let Editors =
-            (Resource "Editors" "slick.editors.js").AssemblyWide()
+            Resource "Editors" "slick.editors.js"
             |> Requires [Js]
 
         let Formatters =
-            (Resource "Formatters" "slick.formatters.js").AssemblyWide()
+            Resource "Formatters" "slick.formatters.js"
+            |> Requires [Js]
+
+        let GroupItemMetadataProvider =
+            Resource "GrouptItemsMetadataProvider" "slick.groupitemmetadataprovider.js"
             |> Requires [Js]
 
         module Plugins =
@@ -47,12 +62,28 @@ module Definition =
 
             let Cellrangeselector =
                 Resource "Cellrangeselector" "slick.cellrangeselector.js"
+                |> Requires [Cellrangedecorator]
 
             let Cellselectionmodel =
                 Resource "Cellselectionmodel" "slick.cellselectionmodel.js"
+                |> Requires [Cellrangeselector]
 
             let Checkboxselectcolumn =
                 Resource "Checkboxselectcolumn" "slick.checkboxselectcolumn.js"
+
+            let HeaderButtonsCss =
+                Resource "HeaderbuttonsCss" "slick.headerbuttons.css"
+
+            let HeaderButtons =
+                Resource "Headerbuttons" "slick.headerbuttons.js"
+                |> Requires [HeaderButtonsCss]
+
+            let HeaderMenuCss =
+                Resource "HeadermneuCss" "slick.headermenu.css"
+
+            let HeaderMenu =
+                Resource "Headermenu" "slick.headermenu.js"
+                |> Requires [HeaderMenuCss]
 
             let Rowmovemanager =
                 Resource "Rowmovemanager" "slick.rowmovemanager.js"
@@ -135,6 +166,13 @@ module Definition =
 
     let Formatter (t: Type.IType) = (T<int> * T<int> * T<string> * Column_t.[t] * t) ^-> T<string>
 
+    let Total =
+        Class "Slick.Total"
+        |+> Instance [
+            "sum" =? T<obj>
+            "avg" =? T<obj>
+        ]
+
     let Column =
         Generic - fun (t: CodeModel.TypeParameter) ->
             Pattern.Config "Slick.Column" {
@@ -152,16 +190,15 @@ module Definition =
                         "field", T<string>
                         "formatter", Formatter t
                         "headerCssClass", T<string>
-                        "id", T<string>
                         "maxWidth", T<int>
                         "minWidth", T<int>
-                        "name", T<string>
                         "rerenderOnResize", T<bool>
                         "resizable", T<bool>
                         "selectable", T<bool>
                         "sortable", T<bool>
                         "validator", T<string> ^-> ValidationResults
                         "width", T<int>
+                        "groupTotalsFormatter", Total * T<string> ^-> T<string>
                     ]
             }
         |=> Column_t
@@ -736,6 +773,26 @@ module Definition =
                         ]
                 }
                 
+        let GroupingOptions =
+            Generic - fun t ->
+                Pattern.Config "Slick.Data.GroupingOptions" {
+                    Required = 
+                        [
+                            "getter", T<string>
+                            "formatter", Group.[t] ^-> T<string>
+                        ]
+                    Optional = 
+                        [
+                            "aggregators", Type.ArrayOf Aggregator.[t]
+                            "aggregateCollapsed", T<bool>
+                            "aggregateEmpty", T<bool>
+                            "aggregateChildGroups", T<bool>
+                            "collapsed", T<bool>
+                            "displayTotalsRow", T<bool>
+                            "lazyTotalsCalculation", T<bool>
+                            "comparer", Group.[t] * Group.[t] ^-> T<int>
+                        ]
+                }
 
         let DataView =
             Generic - fun (t: CodeModel.TypeParameter) ->
@@ -778,6 +835,9 @@ module Definition =
                         "syncGridCellCssStyles" => Grid_t.[t] * T<string> ^-> T<unit>
                         "syncGridSelection" => Grid_t.[t] * T<bool> ^-> T<unit>
                         "updateItem" => T<string> * t ^-> T<unit>
+
+                        "setGrouping" => GroupingOptions.[t] ^-> T<unit>
+                        "setGrouping" => (Type.ArrayOf GroupingOptions.[t]) ^-> T<unit>
                     ]
 
         module Aggregators =
@@ -932,7 +992,10 @@ module Definition =
         let ColumnPicker =
             Generic - fun (t: CodeModel.TypeParameter) ->
                 Class "Slick.Controls.ColumnPicker"
-                |+> Static [Constructor (Type.ArrayOf Column.[t] * Grid_t.[t] * ColumnPickerOptions.[t] + Options.[t])]
+                |+> Static [
+                    Constructor (Type.ArrayOf Column.[t] * Grid_t.[t] * ColumnPickerOptions.[t])
+                    Constructor (Type.ArrayOf Column.[t] * Grid_t.[t] * Options.[t])
+                ]
                 |+> Instance [
                         "handleHeaderContextMenu" => T<Event> * T<obj> ^-> T<unit>
                         "init" => T<unit -> unit>
@@ -965,26 +1028,39 @@ module Definition =
 
     let Assembly =
         Assembly [
-            Namespace "WebSharper.SlickGrid.Resources" [
+            Namespace "WebSharper.SlickGrid.Resources.Lib" [
                 Res.JQueryEventDrag
-                Res.Core
-                Res.Css
-                Res.Js
-                Res.Dataview
-                Res.Editors
-                Res.Formatters
+                Res.JQueryEventDrop
+            ]
+            Namespace "WebSharper.SlickGrid.Resources.Plugins" [
                 Res.Plugins.Autotooltips
                 Res.Plugins.Cellcopymanager
                 Res.Plugins.Cellrangedecorator
                 Res.Plugins.Cellrangeselector
                 Res.Plugins.Cellselectionmodel
                 Res.Plugins.Checkboxselectcolumn
+                Res.Plugins.HeaderMenuCss
+                Res.Plugins.HeaderMenu
+                Res.Plugins.HeaderButtonsCss
+                Res.Plugins.HeaderButtons
                 Res.Plugins.Rowmovemanager
                 Res.Plugins.Rowselectionmodel
+            ]
+            Namespace "WebSharper.SlickGrid.Resources.Controls" [
                 Res.Controls.ColumnpickerCss
                 Res.Controls.Columnpicker
                 Res.Controls.PagerCss
                 Res.Controls.Pager
+            ]
+            Namespace "WebSharper.SlickGrid.Resources" [
+                Res.Core
+                Res.Css
+                Res.DefaultTheme
+                Res.Js
+                Res.Dataview
+                Res.Editors
+                Res.Formatters
+                Res.GroupItemMetadataProvider
             ]
             Namespace "WebSharper.SlickGrid.Slick" [
                 Box
@@ -995,6 +1071,7 @@ module Definition =
                 EditorGenerator
                 ValidationResults
                 Column
+                |> Requires [Res.Plugins.HeaderMenu; Res.Plugins.HeaderButtons]
                 BeforeEditCellEventArgs
                 BeforeMoveRowsArgs
                 CellChangeEventArgs
@@ -1046,6 +1123,7 @@ module Definition =
                 ScrollEventArgs
                 SortColumn
                 SortEventArgs
+                Total
                 ValidationError
                 VerticalRange
                 Options
@@ -1057,11 +1135,14 @@ module Definition =
                 Data.Metadata
                 Data.GroupItemMetadataProviderOptions
                 Data.GroupItemMetadataProvider
+                |> Requires [Res.GroupItemMetadataProvider]
                 Data.PagingInfo
                 Data.PagingOptions
                 Data.RefreshHints
                 Data.DataViewOptions
+                Data.GroupingOptions
                 Data.DataView
+                |> Requires [Res.Dataview]
             ]
             Namespace "WebSharper.SlickGrid.Slick.Data.Aggregators" [
                 Data.Aggregators.AvgAggregator
