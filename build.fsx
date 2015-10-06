@@ -41,7 +41,10 @@ let main =
     bt.WebSharper.Extension("WebSharper.SlickGrid")
         .SourcesFromProject()
         .Embed(resourceFiles)
-        .References(fun rt ->[rt.NuGet("WebSharper.JQueryUi").Reference()])
+        .References(fun rt ->
+            [
+                rt.NuGet("WebSharper.JQueryUi").ForceFoundVersion().Reference()
+            ])
 
 // let website =
 //     bt.WebSharper.Library("Website")
