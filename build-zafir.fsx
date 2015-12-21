@@ -43,7 +43,7 @@ let main =
         .Embed(resourceFiles)
         .References(fun rt ->
             [
-                rt.NuGet("Zafir.JQueryUi").ForceFoundVersion().Reference()
+                rt.NuGet("Zafir.JQueryUi").Latest(true).ForceFoundVersion().Reference()
             ])
 
 bt.Solution [
