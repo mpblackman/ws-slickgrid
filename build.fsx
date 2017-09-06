@@ -3,7 +3,7 @@ open IntelliFactory.Build
 
 let bt =
     BuildTool().PackageId("WebSharper.SlickGrid")
-        .VersionFrom("WebSharper")
+        .VersionFrom("WebSharper", versionSpec = "(,4.0)")
         .WithFSharpVersion(FSharpVersion.FSharp30)
         .WithFramework(fun fw -> fw.Net40)
 
@@ -61,7 +61,7 @@ let main =
 //             [
 //                 r.Project main
 //                 r.Project website
-//                 r.NuGet("WebSharper").At(["/tools/net45/IntelliFactory.Xml.dll"]).Reference()
+//                 r.NuGet("WebSharper").Version("(,4.0)").At(["/tools/net45/IntelliFactory.Xml.dll"]).Reference()
 //             ])
 
 bt.Solution [

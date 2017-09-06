@@ -2,8 +2,8 @@
 open IntelliFactory.Build
 
 let bt =
-    BuildTool().PackageId("Zafir.SlickGrid")
-        .VersionFrom("Zafir")
+    BuildTool().PackageId("WebSharper.SlickGrid")
+        .VersionFrom("WebSharper")
         .WithFSharpVersion(FSharpVersion.FSharp30)
         .WithFramework(fun fw -> fw.Net40)
 
@@ -38,12 +38,12 @@ let resourceFiles =
     ]
 
 let main =
-    bt.Zafir.Extension("WebSharper.SlickGrid")
+    bt.WebSharper4.Extension("WebSharper.SlickGrid")
         .SourcesFromProject()
         .Embed(resourceFiles)
         .References(fun rt ->
             [
-                rt.NuGet("Zafir.JQueryUI").Latest(true).ForceFoundVersion().Reference()
+                rt.NuGet("WebSharper.JQueryUI").Latest(true).ForceFoundVersion().Reference()
             ])
 
 bt.Solution [
@@ -53,7 +53,7 @@ bt.Solution [
     bt.NuGet.CreatePackage()
         .Configure(fun c ->
             { c with
-                Title = Some "Zafir.SlickGrid-2.2"
+                Title = Some "WebSharper.SlickGrid-2.2"
                 LicenseUrl = Some "http://websharper.com/licensing"
                 ProjectUrl = Some "https://github.com/intellifactory/websharper.slickgrid"
                 Description = "WebSharper Extensions for SlickGrids 2.2"
