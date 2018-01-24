@@ -1,37 +1,39 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{64ca108d-fc9f-46d6-aa9c-d19dfdbd2032}</ProjectGuid>
-    <OutputPath>bin</OutputPath>
-    <Name>WebSharper.SlickGrid</Name>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <WebSharperProject>Extension</WebSharperProject>
+    <WebSharperSourceMap>false</WebSharperSourceMap>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Main.fs" />
     <EmbeddedResource Include="SlickGrid/lib/jquery.event.drag-2.2.js" />
+    <EmbeddedResource Include="SlickGrid/lib/jquery.event.drop-2.2.js" />
     <EmbeddedResource Include="SlickGrid/slick.grid.css" />
     <EmbeddedResource Include="SlickGrid/slick.grid.js" />
     <EmbeddedResource Include="SlickGrid/slick.core.js" />
     <EmbeddedResource Include="SlickGrid/slick.dataview.js" />
     <EmbeddedResource Include="SlickGrid/slick.editors.js" />
     <EmbeddedResource Include="SlickGrid/slick.formatters.js" />
+    <EmbeddedResource Include="SlickGrid/slick.groupitemmetadataprovider.js" />
+    <EmbeddedResource Include="SlickGrid/slick-default-theme.css" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.autotooltips.js" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.cellcopymanager.js" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.cellrangedecorator.js" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.cellrangeselector.js" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.cellselectionmodel.js" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.checkboxselectcolumn.js" />
+    <EmbeddedResource Include="SlickGrid/plugins/slick.headerbuttons.css" />
+    <EmbeddedResource Include="SlickGrid/plugins/slick.headerbuttons.js" />
+    <EmbeddedResource Include="SlickGrid/plugins/slick.headermenu.css" />
+    <EmbeddedResource Include="SlickGrid/plugins/slick.headermenu.js" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.rowmovemanager.js" />
     <EmbeddedResource Include="SlickGrid/plugins/slick.rowselectionmodel.js" />
     <EmbeddedResource Include="SlickGrid/controls/slick.columnpicker.css" />
     <EmbeddedResource Include="SlickGrid/controls/slick.columnpicker.js" />
     <EmbeddedResource Include="SlickGrid/controls/slick.pager.css" />
     <EmbeddedResource Include="SlickGrid/controls/slick.pager.js" />
-    <Compile Include="Main.fs" />
   </ItemGroup>
-  <Import Project="../build/net45/$(Name).proj" />
-  <Import Project="$(MSBuildExtensionsPath32)/../Microsoft SDKs/F#/3.0/Framework/v4.0/Microsoft.FSharp.targets" />
-  <Target Name="Build" />
-  <Target Name="Clean" />
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

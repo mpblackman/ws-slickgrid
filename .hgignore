@@ -1,8 +1,12 @@
-^packages/
-^tools/packages/
-^Web/bin/
-^Web/obj/
-^Web/Scripts/
-^build/
-\.suo$
-\.user$
+syntax: glob
+
+packages/
+bin/
+obj/
+build/
+.vs/
+*.suo
+.fake/
+paket-files/
+.vscode/
+nuget/*.paket.template
