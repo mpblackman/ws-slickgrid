@@ -16,5 +16,5 @@ files
     ../WebSharper.SlickGrid/bin/Release/netstandard2.0/WebSharper.SlickGrid.dll ==> lib/netstandard2.0
     ../WebSharper.SlickGrid/bin/Release/netstandard2.0/WebSharper.SlickGrid.xml ==> lib/netstandard2.0
 dependencies
-        WebSharper ~> LOCKEDVERSION/3
-        WebSharper.JQueryUI ~> LOCKEDVERSION/3
+        WebSharper ~> LOCKEDVERSION:[3]
+        WebSharper.JQueryUI ~> LOCKEDVERSION:[3]
