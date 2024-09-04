@@ -1,4 +1,4 @@
-﻿namespace SlickGrid
+﻿namespace WebSharper.SlickGrid
 
 open WebSharper
 open WebSharper.JavaScript
